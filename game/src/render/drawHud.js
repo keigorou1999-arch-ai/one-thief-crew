@@ -3,7 +3,7 @@
 import { ALARM, LOOP_SECONDS, MAX_SELVES, TOOLS, VIEW } from '../config.js';
 import { currentLoopNumber, secondsLeftInLoop } from '../loop/timeLoop.js';
 import { alarmStage, ALERT, CALM } from '../systems/alarmMeter.js';
-import { formatMoney, netTake, valueInHand } from '../systems/lootLedger.js';
+import { formatMoney, formatSignedMoney, takeSoFar, valueInHand } from '../systems/lootLedger.js';
 import { drawLabel, hatchFill, INK, strokeDashedRect } from './blueprintStyle.js';
 
 const BAR = { x: 0, y: 0, w: VIEW.width, h: 88 };
@@ -46,17 +46,31 @@ function drawLoopClock(ctx, session) {
 function drawTake(ctx, world) {
   const ledger = world.ledger;
   drawLabel(ctx, 'NET TAKE', 684, 20, 17, INK.loot);
-  drawLabel(ctx, formatMoney(netTake(ledger)), 684, 51, 34, INK.loot);
+  // Loot in the van plus loot in hand, less the tool bill: what this plan is worth right now.
+  const take = takeSoFar(world);
+  drawLabel(ctx, formatSignedMoney(take), 684, 51, 34, take < 0 ? INK.danger : INK.loot);
   drawLabel(ctx, `IN HAND ${formatMoney(valueInHand(world.loot))}`, 684, 77, 13, INK.loot);
   drawLabel(ctx, `TOOLS ${formatMoney(-ledger.toolSpend)}`, 892, 77, 13, INK.faint, 'right');
   drawLabel(ctx, `IN VAN ${ledger.banked.length}/3`, 892, 20, 13, INK.faint, 'right');
 }
 
-function drawAlarmMeter(ctx, world) {
+function drawAlarmMeter(ctx, world, clock) {
   const stage = alarmStage(world.alarm);
   const color = stage === CALM ? INK.loot : INK.danger;
   const x = 916;
   const width = 344;
+  // Past ALERT the whole meter flashes red.
+  if (stage !== CALM && Math.sin(clock * 10) > -0.2) {
+    ctx.fillStyle = 'rgba(255, 61, 79, 0.3)';
+    ctx.fillRect(902, 2, VIEW.width - 902, 84);
+    ctx.save();
+    ctx.shadowColor = INK.danger;
+    ctx.shadowBlur = 24;
+    ctx.strokeStyle = INK.danger;
+    ctx.lineWidth = 5;
+    ctx.strokeRect(x - 5, 31, width + 10, 38);
+    ctx.restore();
+  }
   drawLabel(ctx, 'ALARM METER', x, 20, 20, INK.danger);
   drawLabel(ctx, stage, x + width, 20, 17, color, 'right');
   ctx.fillStyle = 'rgba(255, 61, 79, 0.12)';
@@ -147,11 +161,11 @@ function drawLegend(ctx) {
   });
 }
 
-export function drawHud(ctx, session) {
+export function drawHud(ctx, session, clock) {
   drawTitleBlock(ctx);
   drawLoopClock(ctx, session);
   drawTake(ctx, session.world);
-  drawAlarmMeter(ctx, session.world);
+  drawAlarmMeter(ctx, session.world, clock);
   drawToolPrices(ctx);
   drawLegend(ctx);
 }

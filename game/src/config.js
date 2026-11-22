@@ -29,7 +29,8 @@ export const GUARD = {
 /** Seconds a watcher needs to be sure of what it sees, up close and at the edge of its cone. */
 export const SIGHT = { nearSeconds: 0.3, farSeconds: 0.85, forgetPerSecond: 1.6, coverRevealDistance: 64 };
 
-export const ALARM = { max: 100, perGhostCaught: 35, perSecondNoticed: 7, alertAt: 50 };
+/** Being fully spotted yourself is the loudest thing that can happen: the meter leaps. */
+export const ALARM = { max: 100, perGhostCaught: 35, perLiveSpotted: 70, perSecondNoticed: 7, alertAt: 50 };
 
 export const VAULT = { crackSeconds: 3.5, radius: 42 };
 

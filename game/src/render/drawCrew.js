@@ -34,10 +34,14 @@ export function drawGhostTrails(ctx, world, emphasis) {
   ctx.restore();
 }
 
-function drawThiefBody(ctx, thief, color, fill) {
+/** How much larger than a ghost the live thief is drawn: the hero must read at thumbnail size. */
+const LIVE_SCALE = 1.55;
+
+function drawThiefBody(ctx, thief, color, fill, scale = 1) {
   ctx.save();
   ctx.translate(thief.x, thief.y);
   ctx.rotate(thief.facing);
+  ctx.scale(scale, scale);
   ctx.fillStyle = fill;
   ctx.strokeStyle = color;
   ctx.lineWidth = 2.5;
@@ -63,7 +67,7 @@ function drawNoticeMark(ctx, thief) {
   ctx.strokeStyle = INK.danger;
   ctx.lineWidth = 4;
   ctx.beginPath();
-  ctx.arc(thief.x, thief.y, 17, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * thief.noticed);
+  ctx.arc(thief.x, thief.y, thief.live ? 34 : 17, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * thief.noticed);
   ctx.stroke();
 }
 
@@ -79,21 +83,24 @@ export function drawThieves(ctx, world, clock) {
     drawNoticeMark(ctx, thief);
   }
   const live = world.live;
+  // A soft white halo and a solid glowing ring: the one bright white thing on the sheet.
+  const ring = 27 + 2 * Math.sin(clock * 5);
   ctx.save();
-  ctx.strokeStyle = INK.you;
-  ctx.globalAlpha = 0.75 + 0.2 * Math.sin(clock * 5);
-  ctx.lineWidth = 2.5;
-  ctx.setLineDash([9, 6]);
-  ctx.lineDashOffset = -clock * 20;
+  ctx.globalAlpha = live.hidden ? 0.4 : 1;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
   ctx.beginPath();
-  ctx.arc(live.x, live.y, 20 + 2 * Math.sin(clock * 5), 0, Math.PI * 2);
-  ctx.stroke();
+  ctx.arc(live.x, live.y, ring, 0, Math.PI * 2);
+  ctx.fill();
+  withGlow(ctx, INK.you, 20, () => {
+    ctx.strokeStyle = INK.you;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(live.x, live.y, ring, 0, Math.PI * 2);
+    ctx.stroke();
+    drawThiefBody(ctx, live, INK.you, INK.you, LIVE_SCALE);
+  });
   ctx.restore();
-  ctx.save();
-  ctx.globalAlpha = live.hidden ? 0.45 : 1;
-  withGlow(ctx, INK.you, 12, () => drawThiefBody(ctx, live, INK.you, INK.you));
-  ctx.restore();
-  drawTag(ctx, live.hidden ? 'YOU (IN DUCT)' : 'YOU', live.x, live.y - 36, 17, INK.you);
+  drawTag(ctx, live.hidden ? 'YOU (IN DUCT)' : 'YOU', live.x, live.y - 48, 22, INK.you);
   drawNoticeMark(ctx, live);
 }
 
@@ -101,8 +108,10 @@ export function drawLoot(ctx, world, clock) {
   for (const item of world.loot) {
     if (item.banked) continue;
     const locked = item.inVault && !world.vault.open;
-    const x = item.carrier ? item.x + 9 : item.x;
-    const y = item.carrier ? item.y - 9 : item.y;
+    // Carried loot rides at the carrier's shoulder, outside the live thief's bright ring.
+    const shoulder = item.carrier ? (item.carrier.live ? 30 : 9) : 0;
+    const x = item.x + shoulder;
+    const y = item.y - shoulder * 0.6;
     const size = item.carrier ? 8 : 11 + Math.sin(clock * 4) * 1.2;
     ctx.save();
     ctx.globalAlpha = locked ? 0.55 : 1;
@@ -120,7 +129,9 @@ export function drawLoot(ctx, world, clock) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.restore();
-    if (!item.carrier) drawTag(ctx, `LOOT $${item.value / 1000}K`, item.x, item.y + (item.inVault ? -28 : 25), 14, INK.loot);
+    // A locked vault's own tag already names its loot.
+    if (locked) continue;
+    if (!item.carrier) drawTag(ctx, `LOOT $${item.value / 1000}K`, item.x - (item.inVault ? 40 : 0), item.y + 27, 14, INK.loot);
     else drawLabel(ctx, `$${item.value / 1000}K`, x + 12, y - 4, 13, INK.loot);
   }
 }

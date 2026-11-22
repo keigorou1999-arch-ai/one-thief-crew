@@ -14,7 +14,7 @@ You rob the Hollow Crown Gallery in 30 second loops. When the clock runs out, or
 - **Three routes.** The front hall through the laser gate (someone has to stand on the hold plate), the cornice ledge outside the north windows (under camera C1), and the air duct (slow, but nobody can see you in it).
 - **Tools cost loot.** Smoke bomb $40K, EMP $90K, coin toss $15K, all paid out of the take, and a ghost's tools are billed again every loop it replays.
 - **Read before you move.** Guards walk fixed patrols with heads that sway; cameras sweep on fixed periods; cones are cut by walls and furniture, and what is drawn is exactly what is tested. Green dotted boxes are safe cover.
-- **A fair catch.** The frame freezes and a red line runs from the eye that saw you to where you stood: `SPOTTED BY GUARD G1 · CLEAR LINE OF SIGHT · 4 M AWAY`.
+- **A fair catch.** The alarm meter leaps 70% and flashes red, the frame freezes and a red line runs from the eye that saw you to where you stood: `SPOTTED BY GUARD G1 · CLEAR LINE OF SIGHT · 4 M AWAY`.
 - **The getaway.** Carry loot to the van, press Space inside it, and read the itemised receipt: what was stolen, what the tools cost, how many loops it took.
 
 Everything is original: the idea, the room, the names, the blueprint art (all drawn with Canvas 2D) and the sounds (all synthesised with WebAudio). No library, no build step, no network request.

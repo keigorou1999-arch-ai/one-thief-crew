@@ -29,6 +29,16 @@ export function valueInHand(loot) {
   return total;
 }
 
+/** What the crew walks away with if everything in hand reaches the van: van + hands - tools. */
+export function takeSoFar(world) {
+  return stolenTotal(world.ledger) + valueInHand(world.loot) - world.ledger.toolSpend;
+}
+
+/** +$440K / -$40K: a take shown with its sign, so profit and loss read at a glance. */
+export function formatSignedMoney(amount) {
+  return amount > 0 ? `+${formatMoney(amount)}` : formatMoney(amount);
+}
+
 export function netTake(ledger) {
   return stolenTotal(ledger) - ledger.toolSpend;
 }

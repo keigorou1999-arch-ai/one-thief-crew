@@ -59,8 +59,12 @@ export function watchForThieves(world) {
       watcher.suspicion[thief.id] = level;
       if (level > thief.noticed) thief.noticed = level;
       if (level < 1) continue;
-      if (thief.live) spottedBy = spottedBy ?? watcher;
-      else catchGhost(thief, watcher, world);
+      if (!thief.live) catchGhost(thief, watcher, world);
+      else if (!spottedBy) {
+        // The watcher is sure: the alarm jumps the moment the live thief is spotted.
+        spottedBy = watcher;
+        raiseAlarm(world.alarm, ALARM.perLiveSpotted);
+      }
     }
   }
   return spottedBy;

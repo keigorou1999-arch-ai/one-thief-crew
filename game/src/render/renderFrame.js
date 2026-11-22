@@ -62,7 +62,7 @@ export function renderFrame(ctx, session, clock, aim) {
   drawCameras(ctx, world);
   if (!leaving) drawThieves(ctx, world, clock);
   if (screen === SCREEN_PLAY && aim) drawCoinAim(ctx, world, aim);
-  drawHud(ctx, session);
+  drawHud(ctx, session, clock);
   if (screen === SCREEN_TITLE) drawTitleScreen(ctx, clock);
   else if (screen === SCREEN_CAUGHT) drawCaughtFreeze(ctx, session);
   else if (screen === SCREEN_REWIND) drawRewindSweep(ctx, session, clock);

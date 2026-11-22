@@ -123,7 +123,8 @@ function drawLaserGateAndPlate(ctx, world, clock) {
   ctx.fillRect(HOLD_PLATE.x - 15, HOLD_PLATE.y - 15, 30, 30);
   ctx.strokeRect(HOLD_PLATE.x - 15, HOLD_PLATE.y - 15, 30, 30);
   ctx.strokeRect(HOLD_PLATE.x - 9, HOLD_PLATE.y - 9, 18, 18);
-  drawLabel(ctx, 'HOLD PLATE', HOLD_PLATE.x, HOLD_PLATE.y - 25, 11, held ? INK.safe : INK.faint, 'center');
+  // Below the plate, so it never sits under the tag of whoever stands on it.
+  drawLabel(ctx, held ? 'PLATE HELD' : 'HOLD PLATE', HOLD_PLATE.x, HOLD_PLATE.y + 30, 11, held ? INK.safe : INK.faint, 'center');
 }
 
 function drawVault(ctx, world) {
@@ -139,14 +140,18 @@ function drawVault(ctx, world) {
     ctx.arc(box.x + box.w / 2, box.y + box.h / 2, 10, 0, Math.PI * 2);
     ctx.stroke();
   });
-  drawTag(ctx, vault.open ? 'VAULT OPEN' : 'VAULT', box.x + 2, box.y - 14, 13, INK.loot);
-  if (!vault.open && vault.progress > 0) {
+  // One tag says everything about the vault, so nothing piles up around its door.
+  const cracking = !vault.open && vault.progress > 0;
+  let tag = 'VAULT · LOOT $900K';
+  if (vault.open) tag = 'VAULT OPEN';
+  else if (cracking) tag = `CRACKING ${Math.round((100 * vault.progress) / VAULT.crackSeconds)}% · $900K`;
+  drawTag(ctx, tag, 1160, box.y - 28, 14, INK.loot);
+  if (cracking) {
     ctx.strokeStyle = INK.loot;
     ctx.lineWidth = 5;
     ctx.beginPath();
-    ctx.arc(VAULT_DOOR.x, VAULT_DOOR.y, 24, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * vault.progress) / VAULT.crackSeconds);
+    ctx.arc(VAULT_DOOR.x, VAULT_DOOR.y, 26, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * vault.progress) / VAULT.crackSeconds);
     ctx.stroke();
-    drawLabel(ctx, 'CRACKING', VAULT_DOOR.x, VAULT_DOOR.y + 38, 12, INK.loot, 'center');
   }
 }
 

@@ -67,8 +67,8 @@ export function drawCaughtFreeze(ctx, session) {
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.arc(watcher.x, watcher.y, 22, 0, Math.PI * 2);
-    ctx.moveTo(live.x + 26, live.y);
-    ctx.arc(live.x, live.y, 26, 0, Math.PI * 2);
+    ctx.moveTo(live.x + 38, live.y);
+    ctx.arc(live.x, live.y, 38, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
     const who = watcher.kind === 'guard' ? `GUARD ${watcher.name}` : `CAMERA ${watcher.name}`;
