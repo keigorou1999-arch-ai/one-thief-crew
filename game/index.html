@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ONE-THIEF CREW: a time-loop heist on a blueprint</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #061a3c; }
+  body { display: flex; align-items: center; justify-content: center; }
+  /* The 1280 x 800 drawing sheet, scaled to fit the window without changing its shape. */
+  #game { display: block; width: min(100vw, 160vh); height: min(100vh, 62.5vw); cursor: crosshair; }
+  /* Read aloud, never shown: the status line screen readers announce. */
+  #status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="One-Thief Crew: a heist where your past loops replay as ghosts. WASD to move, Space for vents and the van, 1 smoke, 2 EMP, click to toss a coin, R to rewind."></canvas>
+<p id="status" role="status" aria-live="polite"></p>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
